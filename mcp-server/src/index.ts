@@ -1,5 +1,6 @@
+import express from "express";
 import { Server } from "@modelcontextprotocol/sdk/server/index.js";
-import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
+import { SSEServerTransport } from "@modelcontextprotocol/sdk/server/sse.js";
 import { CallToolRequestSchema, ListToolsRequestSchema } from "@modelcontextprotocol/sdk/types.js";
 
 import { InMemoryCompanyRepository } from "./modules/companies/infrastructure/repositories/InMemoryCompanyRepository.js";
@@ -8,12 +9,13 @@ import { ResolveCompanyProfileUseCase } from "./modules/companies/application/us
 import { resolveCompanyToolDefinition, createResolveCompanyHandler } from "./modules/companies/presentation/tools/resolveCompanyTool.js";
 import { logger } from "./shared/utils/logger.js";
 
-const apiKey = process.env["CMF_API_KEY"] ?? "";
+const MCP_API_KEY = process.env["MCP_API_KEY"] ?? "";
+const CMF_API_KEY = process.env["CMF_API_KEY"] ?? "";
+const PORT = parseInt(process.env["PORT"] ?? "3001");
 
 const repository = new InMemoryCompanyRepository();
-const cmfApi     = new CmfApiAdapter(apiKey);
+const cmfApi = new CmfApiAdapter(CMF_API_KEY);
 const resolveCompanyUseCase = new ResolveCompanyProfileUseCase(repository, cmfApi);
-
 const resolveCompanyHandler = createResolveCompanyHandler(resolveCompanyUseCase);
 
 const server = new Server(
@@ -27,24 +29,51 @@ server.setRequestHandler(ListToolsRequestSchema, async () => ({
 
 server.setRequestHandler(CallToolRequestSchema, async (request) => {
   const { name, arguments: args = {} } = request.params;
-
-  if (name === "resolve_company") {
-    return resolveCompanyHandler(args);
-  }
-
-  return {
-    content: [{ type: "text", text: `Tool desconocido: ${name}` }],
-    isError: true,
-  };
+  if (name === "resolve_company") return resolveCompanyHandler(args);
+  return { content: [{ type: "text", text: `Tool desconocido: ${name}` }], isError: true };
 });
 
-async function main() {
-  const transport = new StdioServerTransport();
-  await server.connect(transport);
-  logger.info("resguard-mcp-server started");
-}
+const app = express();
+app.use(express.json());
 
-main().catch((err) => {
-  logger.error("Fatal error", err);
-  process.exit(1);
+app.use((req, res, next) => {
+  const key = req.headers["x-api-key"];
+  if (!MCP_API_KEY || key !== MCP_API_KEY) {
+    res.status(401).json({ error: "Unauthorized" });
+    return;
+  }
+  next();
+});
+
+const transports = new Map<string, SSEServerTransport>();
+
+app.get("/sse", async (_req, res) => {
+  const transport = new SSEServerTransport("/messages", res);
+  transports.set(transport.sessionId, transport);
+
+  // Keepalive: ping cada 25 segundos para mantener la conexión viva en Railway
+  const keepalive = setInterval(() => {
+    res.write(": ping\n\n");
+  }, 25000);
+
+  res.on("close", () => {
+    clearInterval(keepalive);
+    transports.delete(transport.sessionId);
+  });
+
+  await server.connect(transport);
+});
+
+app.post("/messages", async (req, res) => {
+  const sessionId = req.query["sessionId"] as string;
+  const transport = transports.get(sessionId);
+  if (!transport) {
+    res.status(404).json({ error: "Session not found" });
+    return;
+  }
+  await transport.handlePostMessage(req, res);
+});
+
+app.listen(PORT, () => {
+  logger.info(`resguard-mcp-server listening on port ${PORT}`);
 });
