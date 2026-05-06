@@ -40,8 +40,8 @@ export default function StepAnalyzing({ labels, error, email }: Props) {
 
   return (
     <div className="flex flex-col items-center w-full">
-      <div className="w-14 h-14 rounded-2xl bg-indigo-50 flex items-center justify-center mb-5">
-        <div className="w-7 h-7 rounded-full border-2 border-indigo-500 border-t-transparent animate-spin" />
+      <div className="w-14 h-14 rounded-2xl bg-emerald-50 flex items-center justify-center mb-5">
+        <div className="w-7 h-7 rounded-full border-2 border-emerald-500 border-t-transparent animate-spin" />
       </div>
       <h2 className="text-2xl font-bold text-slate-900 mb-1">Analizando tus datos</h2>
       <p className="text-slate-500 mb-2 text-sm">{email}</p>
@@ -53,7 +53,7 @@ export default function StepAnalyzing({ labels, error, email }: Props) {
             <div
               key={i}
               className={`flex-1 h-1 rounded-full transition-all duration-700 ${
-                i <= activeStage ? "bg-indigo-500" : "bg-slate-100"
+                i <= activeStage ? "bg-emerald-500" : "bg-slate-100"
               }`}
             />
           ))}

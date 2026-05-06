@@ -22,8 +22,8 @@ export default function StepUpload({ file, onFile, onNext, onBack }: Props) {
 
   return (
     <div className="flex flex-col items-center text-center">
-      <div className="w-14 h-14 rounded-2xl bg-violet-50 flex items-center justify-center mb-5">
-        <svg className="w-7 h-7 text-violet-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
+      <div className="w-14 h-14 rounded-2xl bg-emerald-50 flex items-center justify-center mb-5">
+        <svg className="w-7 h-7 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
           <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m.75 12l3 3m0 0l3-3m-3 3v-6m-1.5-9H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
         </svg>
       </div>
@@ -38,7 +38,7 @@ export default function StepUpload({ file, onFile, onNext, onBack }: Props) {
         onDragLeave={() => setDragging(false)}
         onDrop={handleDrop}
         className={`w-full max-w-sm cursor-pointer rounded-2xl border-2 border-dashed p-8 transition-all
-          ${dragging ? "border-violet-400 bg-violet-50" : file ? "border-green-400 bg-green-50" : "border-slate-200 hover:border-violet-300 hover:bg-violet-50/40"}`}
+          ${dragging ? "border-emerald-400 bg-emerald-50" : file ? "border-emerald-400 bg-emerald-50" : "border-slate-200 hover:border-emerald-300 hover:bg-emerald-50/40"}`}
       >
         {file ? (
           <div className="flex flex-col items-center gap-2">
@@ -78,7 +78,7 @@ export default function StepUpload({ file, onFile, onNext, onBack }: Props) {
         <button
           onClick={onNext}
           disabled={!file}
-          className="flex-1 py-3.5 rounded-xl bg-violet-600 hover:bg-violet-700 text-white font-semibold text-sm transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+          className="flex-1 py-3.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-sm transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
         >
           Analizar →
         </button>

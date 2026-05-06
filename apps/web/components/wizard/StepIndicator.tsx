@@ -23,9 +23,9 @@ export default function StepIndicator({ current }: { current: WizardStep }) {
               <div
                 className={`w-9 h-9 rounded-full flex items-center justify-center text-sm font-bold transition-all duration-300 ${
                   done
-                    ? "bg-indigo-500 text-white"
+                    ? "bg-emerald-500 text-white"
                     : active
-                    ? "bg-indigo-600 text-white ring-4 ring-indigo-100"
+                    ? "bg-emerald-600 text-white ring-4 ring-emerald-100"
                     : "bg-slate-100 text-slate-400"
                 }`}
               >
@@ -39,7 +39,7 @@ export default function StepIndicator({ current }: { current: WizardStep }) {
               </div>
               <span
                 className={`mt-1.5 text-xs font-medium whitespace-nowrap ${
-                  active ? "text-indigo-600" : done ? "text-slate-500" : "text-slate-300"
+                  active ? "text-emerald-600" : done ? "text-slate-500" : "text-slate-300"
                 }`}
               >
                 {step.label}
@@ -48,7 +48,7 @@ export default function StepIndicator({ current }: { current: WizardStep }) {
             {i < STEPS.length - 1 && (
               <div
                 className={`w-16 h-0.5 mb-5 mx-1 transition-all duration-500 ${
-                  i < currentIdx ? "bg-indigo-500" : "bg-slate-200"
+                  i < currentIdx ? "bg-emerald-500" : "bg-slate-200"
                 }`}
               />
             )}

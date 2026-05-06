@@ -173,12 +173,12 @@ export default function StepResults({ result, email, onReset }: Props) {
       {/* Sticky header */}
       <header className="sticky top-0 z-10 bg-[#f5f0e8]/90 backdrop-blur-sm border-b border-[#e8e0d0] px-6 py-4 flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <div className="w-7 h-7 rounded-lg bg-slate-900 flex items-center justify-center">
-            <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+          <div className="w-10 h-10 rounded-xl bg-emerald-600 flex items-center justify-center shadow-sm">
+            <svg className="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" />
             </svg>
           </div>
-          <span className="font-bold text-slate-900 text-sm">ResGuard AI</span>
+          <span className="font-bold text-slate-900 text-base">ResGuard AI</span>
           <span className="text-slate-300">·</span>
           <span className="text-sm text-slate-500 hidden sm:block">{email}</span>
         </div>
@@ -363,7 +363,7 @@ export default function StepResults({ result, email, onReset }: Props) {
         {/* CMF shortcut */}
         <div className="bg-white rounded-2xl border border-slate-100 p-5">
           <div className="flex items-start gap-3">
-            <div className="w-10 h-10 rounded-xl bg-indigo-50 flex items-center justify-center text-xl shrink-0">🏛️</div>
+            <div className="w-10 h-10 rounded-xl bg-emerald-50 flex items-center justify-center text-xl shrink-0">🏛️</div>
             <div className="flex-1">
               <h3 className="font-bold text-slate-900 mb-0.5">Reclamo ante la CMF</h3>
               <p className="text-sm text-slate-500 mb-3">
@@ -373,7 +373,7 @@ export default function StepResults({ result, email, onReset }: Props) {
                 href="https://www.cmfchile.cl/portal/principal/606/w3-propertyvalue-25625.html"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-1.5 text-sm font-semibold text-indigo-700 hover:text-indigo-900 transition-colors"
+                className="inline-flex items-center gap-1.5 text-sm font-semibold text-emerald-700 hover:text-emerald-900 transition-colors"
               >
                 Ir a CMF →
               </a>

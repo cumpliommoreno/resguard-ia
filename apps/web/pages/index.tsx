@@ -31,16 +31,16 @@ export default function Home() {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
       </Head>
 
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-indigo-50/30 flex flex-col">
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-emerald-50/40 flex flex-col">
         {/* Navbar */}
         <header className="flex items-center justify-between px-6 py-4 border-b border-slate-100 bg-white/70 backdrop-blur-sm sticky top-0 z-10">
-          <div className="flex items-center gap-2">
-            <div className="w-7 h-7 rounded-lg bg-indigo-600 flex items-center justify-center">
-              <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-emerald-600 flex items-center justify-center shadow-sm">
+              <svg className="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" />
               </svg>
             </div>
-            <span className="font-bold text-slate-900 text-sm tracking-tight">ResGuard AI</span>
+            <span className="font-bold text-slate-900 text-base tracking-tight">ResGuard AI</span>
           </div>
           <span className="text-xs text-slate-400 bg-slate-100 px-2.5 py-1 rounded-full font-medium">Hackathon 2025</span>
         </header>
@@ -51,12 +51,12 @@ export default function Home() {
             {/* Hero text — only on first step */}
             {step === "email" && (
               <div className="text-center mb-10">
-                <span className="inline-block text-xs font-semibold text-indigo-600 bg-indigo-50 border border-indigo-100 px-3 py-1 rounded-full mb-4">
+                <span className="inline-block text-xs font-semibold text-emerald-700 bg-emerald-50 border border-emerald-100 px-3 py-1 rounded-full mb-4">
                   Privacidad · Transparencia · Control
                 </span>
                 <h1 className="text-4xl font-extrabold text-slate-900 tracking-tight mb-3 leading-tight">
                   ¿Tus datos están<br />
-                  <span className="text-indigo-600">realmente seguros?</span>
+                  <span className="text-emerald-600">realmente seguros?</span>
                 </h1>
                 <p className="text-slate-500 text-base max-w-sm mx-auto">
                   Sube tu contrato bancario y te decimos exactamente cómo están usando tus datos — y qué hacer al respecto.
