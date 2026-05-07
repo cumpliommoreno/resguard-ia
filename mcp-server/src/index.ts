@@ -96,7 +96,7 @@ async function uploadLawPdfs(): Promise<void> {
 // ─── Express ─────────────────────────────────────────────────────────────────
 
 const app = express();
-app.use(express.json());
+app.use(express.json({ limit: "50mb" }));
 
 app.use((req, res, next) => {
   const key = req.headers["x-api-key"];
