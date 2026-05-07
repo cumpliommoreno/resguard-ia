@@ -49,7 +49,8 @@ export default function Home() {
         </header>
 
         {/* Contenido scrolleable */}
-        <main className="flex-1 overflow-y-auto flex items-center justify-center px-4 py-8">
+        <main className="flex-1 overflow-y-auto">
+          <div className="min-h-full flex items-center justify-center px-4 py-8">
           <div className="w-full max-w-lg">
             {/* Hero text — solo en primer paso */}
             {step === "email" && (
@@ -108,6 +109,7 @@ export default function Home() {
                 ))}
               </div>
             )}
+          </div>
           </div>
         </main>
       </div>
