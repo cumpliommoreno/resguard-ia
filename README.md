@@ -251,4 +251,4 @@ El banco tiene **2 días hábiles** para acusar recibo y **5 días** para respon
 
 ---
 
-## Hackathon 2026
+## Hackathon Claude 2026
