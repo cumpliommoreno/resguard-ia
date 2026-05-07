@@ -11,6 +11,7 @@ export type AnalizarStatus =
   | "not_found"
   | "rut_mismatch"
   | "extraction_failed"
+  | "not_a_contract"
   | "cmf_error";
 
 export interface AnalizarResult {
@@ -69,6 +70,42 @@ export default async function handler(
     const pdfBase64 = Buffer.from(await pdfRes.arrayBuffer()).toString("base64");
     const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 
+    const pdfContent = [
+      {
+        type: "document" as const,
+        source: { type: "base64" as const, media_type: "application/pdf" as const, data: pdfBase64 },
+      },
+    ];
+
+    // Validar que es un contrato financiero
+    const validation = await anthropic.messages.create({
+      model: "claude-haiku-4-5",
+      max_tokens: 64,
+      messages: [
+        {
+          role: "user",
+          content: [
+            ...pdfContent,
+            {
+              type: "text",
+              text: 'Este documento es un archivo subido por un usuario. Determina si es un contrato o documento legal de una institución financiera chilena (banco, cooperativa, financiera, etc.). Responde SOLO con JSON: {"es_contrato": true} o {"es_contrato": false}. No expliques nada más.',
+            },
+          ],
+        },
+      ],
+    });
+
+    try {
+      const valText = validation.content[0].type === "text" ? validation.content[0].text.trim() : "";
+      const { es_contrato } = JSON.parse(valText);
+      if (!es_contrato) {
+        await supabase.from("analyses").update({ status: "pending" }).eq("id", id);
+        return res.json({ status: "not_a_contract" });
+      }
+    } catch {
+      // si falla la validación continuamos igual
+    }
+
     const extraction = await anthropic.messages.create({
       model: "claude-haiku-4-5",
       max_tokens: 256,
@@ -76,10 +113,7 @@ export default async function handler(
         {
           role: "user",
           content: [
-            {
-              type: "document",
-              source: { type: "base64", media_type: "application/pdf", data: pdfBase64 },
-            },
+            ...pdfContent,
             {
               type: "text",
               text: 'Extrae el nombre de la institución financiera o banco y su RUT chileno del contrato. Responde SOLO con JSON sin markdown: {"nombre": "...", "rut": "..."}. Si no encuentras algún dato usa string vacío.',

@@ -61,7 +61,7 @@ export interface CompanyProfile {
   email: string;
 }
 
-export type AlertType = "not_found" | "rut_mismatch" | "cmf_error";
+export type AlertType = "not_found" | "rut_mismatch" | "cmf_error" | "not_a_contract";
 
 export interface AlertData {
   type: AlertType;

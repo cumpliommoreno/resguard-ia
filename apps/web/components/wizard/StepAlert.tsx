@@ -7,20 +7,24 @@ interface Props {
 
 export default function StepAlert({ alert, onReset }: Props) {
   const isCritical = alert.type === "rut_mismatch";
+  const isWarning  = alert.type === "not_a_contract" || alert.type === "cmf_error";
 
   return (
     <div className="flex flex-col items-center text-center gap-6 py-4">
       {/* Icon */}
-      <div className={`w-16 h-16 rounded-2xl flex items-center justify-center ${isCritical ? "bg-red-100" : "bg-amber-100"}`}>
-        <svg className={`w-8 h-8 ${isCritical ? "text-red-600" : "text-amber-600"}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+      <div className={`w-16 h-16 rounded-2xl flex items-center justify-center ${isCritical ? "bg-red-100" : isWarning ? "bg-slate-100" : "bg-amber-100"}`}>
+        <svg className={`w-8 h-8 ${isCritical ? "text-red-600" : isWarning ? "text-slate-500" : "text-amber-600"}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
           <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
         </svg>
       </div>
 
       {/* Title */}
       <div>
-        <h2 className={`text-xl font-bold mb-1 ${isCritical ? "text-red-700" : "text-amber-700"}`}>
-          {isCritical ? "Posible suplantación de identidad" : "Empresa no encontrada en CMF"}
+        <h2 className={`text-xl font-bold mb-1 ${isCritical ? "text-red-700" : isWarning ? "text-slate-700" : "text-amber-700"}`}>
+          {isCritical ? "Posible suplantación de identidad"
+            : alert.type === "not_a_contract" ? "El archivo no es un contrato financiero"
+            : alert.type === "cmf_error" ? "Error al consultar la CMF"
+            : "Empresa no encontrada en CMF"}
         </h2>
 
         {alert.type === "not_found" && (
@@ -45,6 +49,12 @@ export default function StepAlert({ alert, onReset }: Props) {
               </div>
             </div>
           </div>
+        )}
+
+        {alert.type === "not_a_contract" && (
+          <p className="text-slate-600 text-sm max-w-xs mx-auto">
+            El documento que subiste no parece ser un contrato financiero. Por favor sube el contrato de tu banco, tarjeta de crédito u otro producto financiero.
+          </p>
         )}
 
         {alert.type === "cmf_error" && (

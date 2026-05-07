@@ -104,6 +104,15 @@ export function useWizard() {
         return;
       }
 
+      if (data.status === "not_a_contract") {
+        setState((s) => ({
+          ...s,
+          step: "alert",
+          alert: { type: "not_a_contract" },
+        }));
+        return;
+      }
+
       if (data.status === "extraction_failed") {
         setState((s) => ({ ...s, step: "manual_input" }));
         return;
