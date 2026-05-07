@@ -1,21 +1,27 @@
 import type { WizardStep } from "@/types";
 
 const STEPS: { id: WizardStep; label: string }[] = [
-  { id: "email", label: "Tu correo" },
-  { id: "upload", label: "Contrato" },
+  { id: "email",     label: "Tus datos" },
+  { id: "upload",    label: "Contrato" },
   { id: "analyzing", label: "Análisis" },
-  { id: "results", label: "Resultados" },
+  { id: "results",   label: "Resultados" },
 ];
 
 const ORDER: WizardStep[] = ["email", "upload", "analyzing", "results"];
 
+// Steps that visually map to a main step index
+const STEP_MAP: Partial<Record<WizardStep, number>> = {
+  alert:        2,
+  manual_input: 2,
+};
+
 export default function StepIndicator({ current }: { current: WizardStep }) {
-  const currentIdx = ORDER.indexOf(current);
+  const currentIdx = STEP_MAP[current] ?? ORDER.indexOf(current);
 
   return (
     <div className="flex items-center justify-center gap-0 mb-10">
       {STEPS.map((step, i) => {
-        const done = i < currentIdx;
+        const done   = i < currentIdx;
         const active = i === currentIdx;
         return (
           <div key={step.id} className="flex items-center">
@@ -37,20 +43,16 @@ export default function StepIndicator({ current }: { current: WizardStep }) {
                   i + 1
                 )}
               </div>
-              <span
-                className={`mt-1.5 text-xs font-medium whitespace-nowrap ${
-                  active ? "text-emerald-600" : done ? "text-slate-500" : "text-slate-300"
-                }`}
-              >
+              <span className={`mt-1.5 text-xs font-medium whitespace-nowrap ${
+                active ? "text-emerald-600" : done ? "text-slate-500" : "text-slate-300"
+              }`}>
                 {step.label}
               </span>
             </div>
             {i < STEPS.length - 1 && (
-              <div
-                className={`w-16 h-0.5 mb-5 mx-1 transition-all duration-500 ${
-                  i < currentIdx ? "bg-emerald-500" : "bg-slate-200"
-                }`}
-              />
+              <div className={`w-16 h-0.5 mb-5 mx-1 transition-all duration-500 ${
+                i < currentIdx ? "bg-emerald-500" : "bg-slate-200"
+              }`} />
             )}
           </div>
         );
