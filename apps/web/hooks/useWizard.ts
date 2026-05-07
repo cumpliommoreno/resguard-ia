@@ -1,6 +1,7 @@
 import { useState, useCallback, useRef } from "react";
 import type { WizardStep, MCPLabel, ContractAnalysis, AlertData, CompanyProfile } from "@/types";
 import type { AnalizarResult } from "@/pages/api/analizar";
+import type { ClausulasResult } from "@/pages/api/clausulas";
 
 interface WizardState {
   step: WizardStep;
@@ -77,12 +78,30 @@ export function useWizard() {
       if (intervalRef.current) clearInterval(intervalRef.current);
 
       if (data.status === "verified" && data.company) {
-        setState((s) => ({
-          ...s,
-          step: "results",
-          company: data.company!,
-          result: data.analysis ?? null,
-        }));
+        setState((s) => ({ ...s, company: data.company! }));
+
+        // Step 2: analyze clauses in separate call
+        try {
+          const clausulasRes = await fetch("/api/clausulas", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ id }),
+          });
+          const clausulasData: ClausulasResult = await clausulasRes.json();
+
+          done = true;
+          if (intervalRef.current) clearInterval(intervalRef.current);
+          setState((s) => ({
+            ...s,
+            step: "results",
+            company: data.company!,
+            result: clausulasData.analysis ?? null,
+          }));
+        } catch {
+          done = true;
+          if (intervalRef.current) clearInterval(intervalRef.current);
+          setState((s) => ({ ...s, step: "results", company: data.company! }));
+        }
         return;
       }
 
