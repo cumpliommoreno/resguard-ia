@@ -2,6 +2,7 @@ import { useState, useCallback, useRef } from "react";
 import type { WizardStep, MCPLabel, ContractAnalysis, AlertData, CompanyProfile } from "@/types";
 import type { AnalizarResult } from "@/pages/api/analizar";
 import type { ClausulasResult } from "@/pages/api/clausulas";
+import type { StatusResult } from "@/pages/api/status";
 
 interface WizardState {
   step: WizardStep;
@@ -80,28 +81,51 @@ export function useWizard() {
       if (data.status === "verified" && data.company) {
         setState((s) => ({ ...s, company: data.company! }));
 
-        // Step 2: analyze clauses in separate call
-        try {
-          const clausulasRes = await fetch("/api/clausulas", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ id }),
-          });
-          const clausulasData: ClausulasResult = await clausulasRes.json();
+        // Step 2: trigger clause analysis (fire and forget)
+        await fetch("/api/clausulas", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ id }),
+        });
 
-          done = true;
-          if (intervalRef.current) clearInterval(intervalRef.current);
-          setState((s) => ({
-            ...s,
-            step: "results",
-            company: data.company!,
-            result: clausulasData.analysis ?? null,
-          }));
-        } catch {
+        // Step 3: poll Supabase every 3s until completed or failed
+        const poll = async () => {
+          const maxAttempts = 20; // 60s max polling
+          for (let i = 0; i < maxAttempts; i++) {
+            await new Promise((r) => setTimeout(r, 3000));
+            try {
+              const statusRes = await fetch(`/api/status?id=${id}`);
+              const statusData: StatusResult = await statusRes.json();
+
+              if (statusData.status === "completed") {
+                done = true;
+                if (intervalRef.current) clearInterval(intervalRef.current);
+                setState((s) => ({
+                  ...s,
+                  step: "results",
+                  company: data.company!,
+                  result: statusData.analysis ?? null,
+                }));
+                return;
+              }
+
+              if (statusData.status === "failed") {
+                done = true;
+                if (intervalRef.current) clearInterval(intervalRef.current);
+                setState((s) => ({ ...s, step: "results", company: data.company! }));
+                return;
+              }
+            } catch {
+              // keep polling
+            }
+          }
+          // timeout — show results anyway
           done = true;
           if (intervalRef.current) clearInterval(intervalRef.current);
           setState((s) => ({ ...s, step: "results", company: data.company! }));
-        }
+        };
+
+        poll();
         return;
       }
 

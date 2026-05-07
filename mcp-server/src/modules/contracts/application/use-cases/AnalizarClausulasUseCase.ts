@@ -91,7 +91,7 @@ export class AnalizarClausulasUseCase {
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const createParams: any = {
-      model: "claude-opus-4-7",
+      model: "claude-sonnet-4-6",
       max_tokens: 4096,
       thinking: { type: "adaptive" },
       messages: [{ role: "user", content }],
