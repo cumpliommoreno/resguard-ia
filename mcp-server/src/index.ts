@@ -123,7 +123,8 @@ app.post("/messages", async (req, res) => {
     res.status(404).json({ error: "Session not found" });
     return;
   }
-  await transport.handlePostMessage(req, res);
+  // Pass req.body explicitly since express.json() already consumed the stream
+  await transport.handlePostMessage(req, res, req.body);
 });
 
 app.listen(PORT, async () => {
