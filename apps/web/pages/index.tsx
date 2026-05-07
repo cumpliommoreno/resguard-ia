@@ -6,10 +6,12 @@ import StepEmail from "@/components/wizard/StepEmail";
 import StepUpload from "@/components/wizard/StepUpload";
 import StepAnalyzing from "@/components/wizard/StepAnalyzing";
 import StepResults from "@/components/wizard/StepResults";
+import StepAlert from "@/components/wizard/StepAlert";
+import StepManualInput from "@/components/wizard/StepManualInput";
 
 export default function Home() {
-  const { state, setEmail, setFile, goToUpload, goToEmail, startAnalysis, reset } = useWizard();
-  const { step, email, file, labels, result, error } = state;
+  const { state, setEmail, setFile, goToUpload, goToEmail, startAnalysis, retryWithManual, reset } = useWizard();
+  const { step, email, file, labels, result, alert, manualLoading, error } = state;
 
   // Results take over the full page
   if (step === "results" && result) {
@@ -77,6 +79,12 @@ export default function Home() {
               )}
               {step === "analyzing" && (
                 <StepAnalyzing labels={labels} error={error} email={email} />
+              )}
+              {step === "alert" && alert && (
+                <StepAlert alert={alert} onReset={reset} />
+              )}
+              {step === "manual_input" && (
+                <StepManualInput onSubmit={retryWithManual} loading={manualLoading} />
               )}
             </div>
 

@@ -1,6 +1,6 @@
 export type MCPSource = "gmail" | "drive" | "calendar";
 export type RiskLevel = "critical" | "high" | "medium" | "low" | "safe";
-export type WizardStep = "email" | "upload" | "analyzing" | "results";
+export type WizardStep = "email" | "upload" | "analyzing" | "results" | "alert" | "manual_input";
 export type FindingStatus = "excede_ley" | "revisa" | "conforme";
 
 export interface MCPLabel {
@@ -50,6 +50,25 @@ export interface ContractAnalysis {
   dataSharing: DataSharingOption[];
   laws: LawItem[];
   emailAction: EmailAction;
+}
+
+export interface CompanyProfile {
+  codigo: string;
+  nombre: string;
+  rut: string;
+  paginaWeb: string;
+  direccion: string;
+  email: string;
+}
+
+export type AlertType = "not_found" | "rut_mismatch" | "cmf_error";
+
+export interface AlertData {
+  type: AlertType;
+  nombre?: string;
+  contractRut?: string;
+  cmfRut?: string;
+  message?: string;
 }
 
 export interface MCPStatus {
