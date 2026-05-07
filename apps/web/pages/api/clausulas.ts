@@ -35,13 +35,23 @@ export default async function handler(
     paginaWeb: "", direccion: "", email: "",
   };
 
+  // Download PDF in Vercel (has blob auth) and send as base64 to Railway MCP
+  const pdfRes = await fetch(analysis.file_url, {
+    headers: { Authorization: `Bearer ${process.env.BLOB_READ_WRITE_TOKEN!}` },
+  });
+  if (!pdfRes.ok) {
+    await supabase.from("analyses").update({ status: "failed" }).eq("id", id);
+    return res.json({ status: "failed" });
+  }
+  const pdfBase64 = Buffer.from(await pdfRes.arrayBuffer()).toString("base64");
+
   try {
     const mcpResult = await callMcpTool(
       process.env.MCP_SERVER_URL!,
       process.env.MCP_API_KEY!,
       "analizar_clausulas",
       {
-        file_url: analysis.file_url,
+        pdf_base64: pdfBase64,
         company,
         titular: {
           nombre: analysis.titular_nombre ?? "",

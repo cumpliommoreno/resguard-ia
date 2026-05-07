@@ -10,7 +10,8 @@ export interface CompanyInput {
 }
 
 export interface AnalizarClausulasInput {
-  file_url: string;
+  file_url?: string;
+  pdf_base64?: string;
   company: CompanyInput;
   titular?: { nombre: string; rut: string };
 }
@@ -53,10 +54,16 @@ export class AnalizarClausulasUseCase {
   }
 
   async execute(input: AnalizarClausulasInput): Promise<AnalizarClausulasOutput> {
-    // Download contract PDF from Vercel Blob
-    const pdfRes = await fetch(input.file_url);
-    if (!pdfRes.ok) throw new Error("download_failed");
-    const pdfBase64 = Buffer.from(await pdfRes.arrayBuffer()).toString("base64");
+    // Use pre-downloaded base64 PDF (sent by Vercel which has blob auth)
+    // or fall back to downloading from URL
+    let pdfBase64: string;
+    if (input.pdf_base64) {
+      pdfBase64 = input.pdf_base64;
+    } else {
+      const pdfRes = await fetch(input.file_url!);
+      if (!pdfRes.ok) throw new Error("download_failed");
+      pdfBase64 = Buffer.from(await pdfRes.arrayBuffer()).toString("base64");
+    }
 
     const hasLawFiles = !!(lawFileIds.ley19628 && lawFileIds.ley21521);
 
