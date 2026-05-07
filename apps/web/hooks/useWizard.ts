@@ -5,6 +5,8 @@ import type { AnalizarResult } from "@/pages/api/analizar";
 interface WizardState {
   step: WizardStep;
   email: string;
+  nombre: string;
+  rut: string;
   file: File | null;
   analysisId: string | null;
   labels: MCPLabel[];
@@ -18,6 +20,8 @@ interface WizardState {
 const INIT: WizardState = {
   step: "email",
   email: "",
+  nombre: "",
+  rut: "",
   file: null,
   analysisId: null,
   labels: [],
@@ -32,8 +36,10 @@ export function useWizard() {
   const [state, setState] = useState<WizardState>(INIT);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  const setEmail = useCallback((email: string) => setState((s) => ({ ...s, email })), []);
-  const setFile = useCallback((file: File | null) => setState((s) => ({ ...s, file })), []);
+  const setEmail  = useCallback((email: string)  => setState((s) => ({ ...s, email })), []);
+  const setNombre = useCallback((nombre: string) => setState((s) => ({ ...s, nombre })), []);
+  const setRut    = useCallback((rut: string)    => setState((s) => ({ ...s, rut })), []);
+  const setFile   = useCallback((file: File | null) => setState((s) => ({ ...s, file })), []);
   const goToUpload = useCallback(() => setState((s) => ({ ...s, step: "upload" })), []);
   const goToEmail = useCallback(() => setState((s) => ({ ...s, step: "email" })), []);
 
@@ -122,6 +128,8 @@ export function useWizard() {
     try {
       const formData = new FormData();
       formData.append("email", state.email);
+      formData.append("titular_nombre", state.nombre);
+      formData.append("titular_rut", state.rut);
       if (state.file) formData.append("contract", state.file);
 
       const uploadRes = await fetch("/api/analysis/upload", { method: "POST", body: formData });
@@ -148,6 +156,8 @@ export function useWizard() {
   return {
     state,
     setEmail,
+    setNombre,
+    setRut,
     setFile,
     goToUpload,
     goToEmail,

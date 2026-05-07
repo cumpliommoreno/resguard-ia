@@ -10,8 +10,8 @@ import StepAlert from "@/components/wizard/StepAlert";
 import StepManualInput from "@/components/wizard/StepManualInput";
 
 export default function Home() {
-  const { state, setEmail, setFile, goToUpload, goToEmail, startAnalysis, retryWithManual, reset } = useWizard();
-  const { step, email, file, labels, result, alert, manualLoading, error } = state;
+  const { state, setEmail, setNombre, setRut, setFile, goToUpload, goToEmail, startAnalysis, retryWithManual, reset } = useWizard();
+  const { step, email, nombre, rut, file, labels, result, alert, manualLoading, error } = state;
 
   // Results take over the full page
   if (step === "results" && result) {
@@ -72,7 +72,15 @@ export default function Home() {
               <StepIndicator current={step} />
 
               {step === "email" && (
-                <StepEmail email={email} onChange={setEmail} onNext={goToUpload} />
+                <StepEmail
+                  email={email}
+                  nombre={nombre}
+                  rut={rut}
+                  onChangeEmail={setEmail}
+                  onChangeNombre={setNombre}
+                  onChangeRut={setRut}
+                  onNext={goToUpload}
+                />
               )}
               {step === "upload" && (
                 <StepUpload file={file} onFile={setFile} onNext={startAnalysis} onBack={goToEmail} />

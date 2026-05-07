@@ -3,8 +3,10 @@ create table analyses (
   email       text        not null,
   file_url    text        not null,
   file_name   text        not null,
-  entity_name text,
-  entity_rut  text,
+  entity_name     text,
+  entity_rut      text,
+  titular_nombre  text,
+  titular_rut     text,
   status      text        not null default 'pending',
   result      jsonb,
   created_at  timestamptz not null default now(),
@@ -26,3 +28,7 @@ create trigger analyses_updated_at
 
 grant all on public.analyses to service_role;
 grant all on public.analyses to anon;
+
+-- Migration: add titular fields (run if table already exists)
+-- alter table analyses add column if not exists titular_nombre text;
+-- alter table analyses add column if not exists titular_rut text;
