@@ -34,9 +34,9 @@ export default function Home() {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
       </Head>
 
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-emerald-50/40 flex flex-col">
-        {/* Navbar */}
-        <header className="flex items-center justify-between px-6 py-4 border-b border-slate-100 bg-white/70 backdrop-blur-sm sticky top-0 z-10">
+      <div className="h-screen overflow-hidden bg-gradient-to-br from-slate-50 via-white to-emerald-50/40 flex flex-col">
+        {/* Navbar — fijo */}
+        <header className="flex-shrink-0 flex items-center justify-between px-6 py-4 border-b border-slate-100 bg-white/70 backdrop-blur-sm z-10">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-emerald-600 flex items-center justify-center shadow-sm">
               <svg className="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
@@ -48,12 +48,12 @@ export default function Home() {
           <span className="text-xs text-slate-400 bg-slate-100 px-2.5 py-1 rounded-full font-medium">{HACKATHON_LABEL}</span>
         </header>
 
-        {/* Main */}
-        <main className="flex-1 flex items-center justify-center px-4 py-12">
+        {/* Contenido scrolleable */}
+        <main className="flex-1 overflow-y-auto flex items-center justify-center px-4 py-8">
           <div className="w-full max-w-lg">
-            {/* Hero text — only on first step */}
+            {/* Hero text — solo en primer paso */}
             {step === "email" && (
-              <div className="text-center mb-10">
+              <div className="text-center mb-8">
                 <span className="inline-block text-xs font-semibold text-emerald-700 bg-emerald-50 border border-emerald-100 px-3 py-1 rounded-full mb-4">
                   Privacidad · Transparencia · Control
                 </span>
@@ -97,7 +97,7 @@ export default function Home() {
             </div>
 
             {step === "email" && (
-              <div className="flex items-center justify-center gap-6 mt-8 text-xs text-slate-400">
+              <div className="flex items-center justify-center gap-6 mt-6 text-xs text-slate-400">
                 {["Sin almacenamiento", "100% privado", "3 MCPs conectados"].map((t) => (
                   <span key={t} className="flex items-center gap-1.5">
                     <svg className="w-3.5 h-3.5 text-green-500" fill="currentColor" viewBox="0 0 20 20">
