@@ -3,7 +3,7 @@ import { supabase } from "@/lib/supabase";
 import { callMcpTool } from "@/lib/mcpClient";
 import type { ContractAnalysis } from "@/types";
 
-export const config = { api: { bodyParser: true }, maxDuration: 60 };
+export const config = { api: { bodyParser: true }, maxDuration: 120 };
 
 export interface ClausulasResult {
   status: "processing" | "completed" | "failed";
@@ -35,34 +35,36 @@ export default async function handler(
     paginaWeb: "", direccion: "", email: "",
   };
 
-  // Fire and forget — runs in background while we return immediately
-  callMcpTool(
-    process.env.MCP_SERVER_URL!,
-    process.env.MCP_API_KEY!,
-    "analizar_clausulas",
-    {
-      file_url: analysis.file_url,
-      company,
-      titular: {
-        nombre: analysis.titular_nombre ?? "",
-        rut:    analysis.titular_rut    ?? "",
-      },
-    }
-  ).then(async (result) => {
-    const text = result.content?.[0]?.text ?? "{}";
+  try {
+    const mcpResult = await callMcpTool(
+      process.env.MCP_SERVER_URL!,
+      process.env.MCP_API_KEY!,
+      "analizar_clausulas",
+      {
+        file_url: analysis.file_url,
+        company,
+        titular: {
+          nombre: analysis.titular_nombre ?? "",
+          rut:    analysis.titular_rut    ?? "",
+        },
+      }
+    );
+
+    const text = mcpResult.content?.[0]?.text ?? "{}";
     const data = JSON.parse(text) as ContractAnalysis & { error?: string };
+
     if (!data.error) {
       await supabase
         .from("analyses")
         .update({ status: "completed", result: { company, analysis: data } })
         .eq("id", id);
+      return res.json({ status: "completed" });
     } else {
       await supabase.from("analyses").update({ status: "failed" }).eq("id", id);
+      return res.json({ status: "failed" });
     }
-  }).catch(async () => {
+  } catch {
     await supabase.from("analyses").update({ status: "failed" }).eq("id", id);
-  });
-
-  // Respond immediately — don't wait for analysis
-  return res.json({ status: "processing" });
+    return res.json({ status: "failed" });
+  }
 }
