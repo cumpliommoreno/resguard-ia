@@ -18,7 +18,7 @@ export default async function handler(
     if (err) return res.status(400).json({ error: "Error parsing form" });
 
     const email = Array.isArray(fields.email) ? fields.email[0] : fields.email;
-    const contract = Array.isArray(files.contract) ? files.contract[0] : files.contract as File;
+    const contract = Array.isArray(files.contract) ? files.contract[0] : files.contract as unknown as File;
 
     if (!email || !contract) return res.status(400).json({ error: "email and contract are required" });
 
