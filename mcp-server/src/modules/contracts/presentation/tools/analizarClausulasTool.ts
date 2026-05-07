@@ -47,6 +47,7 @@ export function createAnalizarClausulasHandler(useCase: AnalizarClausulasUseCase
       return { content: [{ type: "text", text: JSON.stringify(result) }] };
     } catch (error) {
       const message = error instanceof Error ? error.message : "unknown_error";
+      console.error("[analizarClausulas] error:", message);
       return {
         content: [{ type: "text", text: JSON.stringify({ error: message }) }],
         isError: true,

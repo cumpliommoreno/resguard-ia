@@ -116,17 +116,24 @@ export class AnalizarClausulasUseCase {
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const textBlock = (raw.content as any[]).find((b: any) => b.type === "text");
-    if (!textBlock || textBlock.type !== "text") throw new Error("no_content");
+    if (!textBlock) throw new Error("no_content");
 
-    const jsonText = textBlock.text
-      .replace(/^```(?:json)?\n?/, "")
-      .replace(/\n?```$/, "")
-      .trim();
+    const rawText: string = textBlock.text;
+
+    // Extract JSON: find first { and last } to handle markdown wrapping or extra text
+    const jsonStart = rawText.indexOf("{");
+    const jsonEnd   = rawText.lastIndexOf("}");
+    if (jsonStart === -1 || jsonEnd === -1) {
+      console.error("[AnalizarClausulas] no JSON found in response:", rawText.slice(0, 300));
+      throw new Error("no_json_found");
+    }
+    const jsonText = rawText.slice(jsonStart, jsonEnd + 1);
 
     let parsed: AnalizarClausulasOutput;
     try {
       parsed = JSON.parse(jsonText) as AnalizarClausulasOutput;
-    } catch {
+    } catch (e) {
+      console.error("[AnalizarClausulas] parse_error:", (e as Error).message, "| text:", jsonText.slice(0, 300));
       throw new Error("parse_error");
     }
 
