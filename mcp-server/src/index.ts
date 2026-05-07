@@ -23,6 +23,13 @@ const CMF_API_KEY      = process.env["CMF_API_KEY"] ?? "";
 const ANTHROPIC_API_KEY = process.env["ANTHROPIC_API_KEY"] ?? "";
 const PORT             = parseInt(process.env["PORT"] ?? "3001");
 
+logger.info("env check", {
+  MCP_API_KEY:       MCP_API_KEY       ? `set (${MCP_API_KEY.length} chars)` : "MISSING",
+  CMF_API_KEY:       CMF_API_KEY       ? `set (${CMF_API_KEY.length} chars)` : "MISSING",
+  ANTHROPIC_API_KEY: ANTHROPIC_API_KEY ? `set (${ANTHROPIC_API_KEY.length} chars)` : "MISSING",
+  PORT,
+});
+
 // ─── Use cases ───────────────────────────────────────────────────────────────
 
 const repository          = new InMemoryCompanyRepository();
