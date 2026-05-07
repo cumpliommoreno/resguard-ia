@@ -29,7 +29,7 @@ export default async function handler(
     const ext = (contract.originalFilename ?? "contract.pdf").split(".").pop() ?? "pdf";
     const uniqueName = `${crypto.randomUUID()}.${ext}`;
     const blob = await put(uniqueName, buffer, {
-      access: "private",
+      access: "public",
       contentType: contract.mimetype ?? "application/pdf",
     });
 
