@@ -36,7 +36,7 @@ const analizarClausulasHandler = createAnalizarClausulasHandler(analizarClausula
 // ─── MCP server ──────────────────────────────────────────────────────────────
 
 const server = new Server(
-  { name: "resguard-mcp-server", version: "1.0.0" },
+  { name: "resguard-mcp-server", version: "1.0.1" },
   { capabilities: { tools: {} } }
 );
 
