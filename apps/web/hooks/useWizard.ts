@@ -34,10 +34,6 @@ export function useWizard() {
   const startAnalysis = useCallback(async () => {
     setState((s) => ({ ...s, step: "analyzing", labels: [], error: null }));
 
-    const formData = new FormData();
-    formData.append("email", state.email);
-    if (state.file) formData.append("contract", state.file);
-
     let done = false;
     intervalRef.current = setInterval(async () => {
       if (done) return;
@@ -51,9 +47,22 @@ export function useWizard() {
     }, 1200);
 
     try {
-      const res = await fetch("/api/analysis/run", { method: "POST", body: formData });
-      if (!res.ok) throw new Error("Error en el análisis");
-      const result: ContractAnalysis = await res.json();
+      const formData = new FormData();
+      formData.append("email", state.email);
+      if (state.file) formData.append("contract", state.file);
+
+      const uploadRes = await fetch("/api/analysis/upload", { method: "POST", body: formData });
+      if (!uploadRes.ok) throw new Error("Error subiendo el archivo");
+      const { id } = (await uploadRes.json()) as { id: string };
+
+      const runRes = await fetch("/api/analysis/run", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id }),
+      });
+      if (!runRes.ok) throw new Error("Error en el análisis");
+      const result: ContractAnalysis = await runRes.json();
+
       done = true;
       if (intervalRef.current) clearInterval(intervalRef.current);
       setState((s) => ({ ...s, step: "results", result }));
