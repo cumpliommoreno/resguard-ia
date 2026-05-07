@@ -143,10 +143,10 @@ export default function Home() {
         {/* Contenido — siempre dos columnas en md+ */}
         <main className="flex-1 overflow-y-auto">
           <div className="min-h-full flex items-center justify-center px-6 py-8">
-            <div className="w-full max-w-5xl flex items-center gap-16">
+            <div className="w-full max-w-5xl flex items-start gap-16">
 
-              {/* Izquierda — texto contextual */}
-              <div className="flex-1 hidden md:flex flex-col">
+              {/* Izquierda — texto contextual, alineado al contenido del form */}
+              <div className="flex-1 hidden md:flex flex-col pt-[128px]">
                 {left.badge && (
                   <span className="inline-block text-xs font-semibold text-emerald-700 bg-emerald-50 border border-emerald-100 px-3 py-1 rounded-full mb-6 w-fit">
                     {left.badge}

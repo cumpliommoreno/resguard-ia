@@ -50,7 +50,7 @@ export default function StepIndicator({ current }: { current: WizardStep }) {
               </span>
             </div>
             {i < STEPS.length - 1 && (
-              <div className={`w-16 h-0.5 mb-5 mx-1 transition-all duration-500 ${
+              <div className={`w-8 h-0.5 mb-5 mx-1 transition-all duration-500 ${
                 i < currentIdx ? "bg-emerald-500" : "bg-slate-200"
               }`} />
             )}
