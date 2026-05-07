@@ -61,7 +61,9 @@ export default async function handler(
 
   // If no manual input, extract nombre/RUT from PDF using Haiku
   if (!nombre || !rut) {
-    const pdfRes = await fetch(analysis.file_url);
+    const pdfRes = await fetch(analysis.file_url, {
+      headers: { Authorization: `Bearer ${process.env.BLOB_READ_WRITE_TOKEN}` },
+    });
 
     if (!pdfRes.ok) return res.status(500).json({ error: "Failed to download PDF" });
 
