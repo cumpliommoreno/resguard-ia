@@ -1,1 +1,1 @@
-export const HACKATHON_LABEL = "Hackathon 2026";
+export const HACKATHON_LABEL = "Hackathon Claude 2026";
