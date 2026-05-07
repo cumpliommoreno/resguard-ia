@@ -71,7 +71,12 @@ export function useWizard() {
       if (intervalRef.current) clearInterval(intervalRef.current);
 
       if (data.status === "verified" && data.company) {
-        setState((s) => ({ ...s, step: "results", company: data.company! }));
+        setState((s) => ({
+          ...s,
+          step: "results",
+          company: data.company!,
+          result: data.analysis ?? null,
+        }));
         return;
       }
 
