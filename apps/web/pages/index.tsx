@@ -1,5 +1,6 @@
 import Head from "next/head";
 import { useWizard } from "@/hooks/useWizard";
+import { HACKATHON_LABEL } from "@/lib/constants";
 import StepIndicator from "@/components/wizard/StepIndicator";
 import StepEmail from "@/components/wizard/StepEmail";
 import StepUpload from "@/components/wizard/StepUpload";
@@ -42,7 +43,7 @@ export default function Home() {
             </div>
             <span className="font-bold text-slate-900 text-base tracking-tight">ResGuard AI</span>
           </div>
-          <span className="text-xs text-slate-400 bg-slate-100 px-2.5 py-1 rounded-full font-medium">Hackathon 2025</span>
+          <span className="text-xs text-slate-400 bg-slate-100 px-2.5 py-1 rounded-full font-medium">{HACKATHON_LABEL}</span>
         </header>
 
         {/* Main */}

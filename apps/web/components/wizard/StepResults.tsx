@@ -1,5 +1,6 @@
 import { useState, useRef } from "react";
 import type { ContractAnalysis, FindingStatus, DataSharingOption } from "@/types";
+import { HACKATHON_LABEL } from "@/lib/constants";
 
 // ─── Finding card ────────────────────────────────────────────────────────────
 
@@ -382,7 +383,7 @@ export default function StepResults({ result, email, onReset }: Props) {
         </div>
 
         <p className="text-center text-xs text-slate-400 mt-8">
-          ResGuard AI · Hackathon 2025 · Análisis basado en legislación chilena vigente
+          ResGuard AI · {HACKATHON_LABEL} · Análisis basado en legislación chilena vigente
         </p>
       </section>
     </div>
