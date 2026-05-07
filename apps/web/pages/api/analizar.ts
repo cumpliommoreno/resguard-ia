@@ -52,7 +52,7 @@ export default async function handler(
   // Fetch analysis row (always needed for file_url)
   const { data: analysis } = await supabase
     .from("analyses")
-    .select("file_url")
+    .select("file_url, titular_nombre, titular_rut")
     .eq("id", id)
     .single();
 
@@ -150,7 +150,14 @@ export default async function handler(
       process.env.MCP_SERVER_URL!,
       process.env.MCP_API_KEY!,
       "analizar_clausulas",
-      { file_url: analysis.file_url, company }
+      {
+        file_url: analysis.file_url,
+        company,
+        titular: {
+          nombre: analysis.titular_nombre ?? "",
+          rut:    analysis.titular_rut    ?? "",
+        },
+      }
     );
 
     const clausulasText = clausulasResult.content?.[0]?.text ?? "{}";

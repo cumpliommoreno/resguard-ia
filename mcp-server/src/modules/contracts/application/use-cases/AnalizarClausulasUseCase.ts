@@ -12,6 +12,7 @@ export interface CompanyInput {
 export interface AnalizarClausulasInput {
   file_url: string;
   company: CompanyInput;
+  titular?: { nombre: string; rut: string };
 }
 
 export interface ContractFinding {
@@ -130,21 +131,31 @@ export class AnalizarClausulasUseCase {
   }
 
   private buildPrompt(input: AnalizarClausulasInput): string {
-    const { company } = input;
+    const { company, titular } = input;
     const lawCtx = lawFileIds.ley19628
       ? "Las leyes están adjuntas como documentos — cita artículos exactos."
       : "Usa tu conocimiento de entrenamiento sobre la Ley 19.628 y Ley 21.521.";
+
+    const titularNombre = titular?.nombre || "[Nombre del titular]";
+    const titularRut    = titular?.rut    || "[RUT del titular]";
 
     return `Eres un experto en protección de datos personales y legislación chilena.
 
 Analiza el contrato financiero adjunto en busca de cláusulas problemáticas contra la Ley 19.628 y la Ley 21.521. ${lawCtx}
 
 Institución: ${company.nombre} (RUT: ${company.rut})
+Titular del contrato: ${titularNombre} (RUT: ${titularRut})
 
 Clasifica cada cláusula relevante:
 - "excede_ley": viola o excede lo permitido. Cita el artículo exacto.
 - "revisa": ambigua o potencialmente problemática.
 - "conforme": cumple con la ley.
+
+Para la carta ARCO determina automáticamente el derecho más apropiado según los hallazgos:
+- Cesión de datos a terceros sin consentimiento → Oposición (Art. 6 Ley 19.628)
+- Datos que ya no son necesarios → Cancelación (Art. 12 Ley 19.628)
+- Datos incorrectos o desproporcionados → Rectificación (Art. 13 Ley 19.628)
+- Sin infracciones graves → Acceso (Art. 12 Ley 19.628)
 
 Responde SOLO con JSON válido sin markdown:
 {
@@ -169,7 +180,7 @@ Responde SOLO con JSON válido sin markdown:
     "to": "${company.email}",
     "entityName": "${company.nombre}",
     "subject": "Ejercicio de derechos ARCO — Ley 19.628",
-    "body": "Carta ARCO formal citando artículos violados. String vacío si todo conforme."
+    "body": "Carta ARCO formal en español. Debe incluir:\\n- Nombre y RUT del titular: ${titularNombre}, ${titularRut}\\n- Nombre y RUT del banco: ${company.nombre}, ${company.rut}\\n- Derecho ARCO ejercido con fundamento legal exacto\\n- Lista de cláusulas problemáticas detectadas\\n- Plazo legal: 2 días hábiles acuse, 5 días respuesta\\n- Tono formal y directo\\nString vacío si todo está conforme."
   }
 }`;
   }

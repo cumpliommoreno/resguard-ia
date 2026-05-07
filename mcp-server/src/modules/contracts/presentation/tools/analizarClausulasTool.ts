@@ -19,6 +19,13 @@ export const analizarClausulasToolDefinition: Tool = {
         },
         required: ["nombre", "rut", "email"],
       },
+      titular: {
+        type: "object",
+        properties: {
+          nombre: { type: "string", description: "Nombre completo del titular" },
+          rut:    { type: "string", description: "RUT del titular" },
+        },
+      },
     },
     required: ["file_url", "company"],
   },
@@ -33,6 +40,7 @@ export function createAnalizarClausulasHandler(useCase: AnalizarClausulasUseCase
           nombre: string; rut: string; email: string;
           direccion: string; paginaWeb: string;
         },
+        ...(args["titular"] ? { titular: args["titular"] as { nombre: string; rut: string } } : {}),
       });
       return { content: [{ type: "text", text: JSON.stringify(result) }] };
     } catch (error) {
