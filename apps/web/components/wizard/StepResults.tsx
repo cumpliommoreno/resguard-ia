@@ -73,16 +73,26 @@ export default function StepResults({ result, email, onReset }: Props) {
           <p className="text-slate-500 text-sm mb-6">{result.entityType}</p>
 
           {/* Veredicto rápido */}
-          <div className={`rounded-2xl p-5 mb-6 ${violations.length > 0 ? "bg-red-50 border border-red-200" : "bg-emerald-50 border border-emerald-200"}`}>
-            <p className={`text-2xl font-extrabold ${violations.length > 0 ? "text-red-700" : "text-emerald-700"}`}>
+          <div className={`rounded-2xl p-5 mb-6 ${
+            violations.length > 0 ? "bg-red-50 border border-red-200"
+            : warnings.length > 0 ? "bg-amber-50 border border-amber-200"
+            : "bg-emerald-50 border border-emerald-200"
+          }`}>
+            <p className={`text-2xl font-extrabold ${
+              violations.length > 0 ? "text-red-700"
+              : warnings.length > 0 ? "text-amber-700"
+              : "text-emerald-700"
+            }`}>
               {violations.length > 0
-                ? `${violations.length + warnings.length} cláusula${violations.length + warnings.length !== 1 ? "s" : ""} problemática${violations.length + warnings.length !== 1 ? "s" : ""}`
+                ? `${violations.length} cláusula${violations.length !== 1 ? "s" : ""} viola${violations.length !== 1 ? "n" : ""} la ley`
+                : warnings.length > 0
+                ? `${warnings.length} cláusula${warnings.length !== 1 ? "s" : ""} a revisar`
                 : "Contrato conforme"}
             </p>
             <p className="text-sm text-slate-600 mt-1">
-              {violations.length > 0
+              {issues.length > 0
                 ? `${violations.length} exceden la ley · ${warnings.length} a revisar · ${conformes.length} conformes`
-                : "No se encontraron cláusulas que excedan la legislación chilena"}
+                : "No se encontraron cláusulas problemáticas"}
             </p>
           </div>
 
