@@ -91,10 +91,15 @@ function getLeftContent(step: WizardStep, alertType?: AlertType): LeftContent {
     ],
   };
 
+  // results step (null result = failed/timeout)
   return {
-    title: "ResGuard AI",
-    subtitle: "Protege tus datos personales.",
-    bullets: [],
+    title: "Análisis completado",
+    subtitle: "Revisamos tu contrato contra la legislación chilena de protección de datos.",
+    bullets: [
+      { icon: "⚖️", text: "Ley 19.628 — Protección de datos personales" },
+      { icon: "🏦", text: "Ley 21.521 — Marco Fintech" },
+      { icon: "📧", text: "Carta ARCO lista para enviar" },
+    ],
   };
 }
 
@@ -195,6 +200,21 @@ export default function Home() {
                   )}
                   {step === "manual_input" && (
                     <StepManualInput onSubmit={retryWithManual} loading={manualLoading} />
+                  )}
+                  {step === "results" && !result && (
+                    <div className="pt-6 text-center space-y-4">
+                      <div className="w-14 h-14 rounded-full bg-amber-50 flex items-center justify-center text-3xl mx-auto">⚠️</div>
+                      <div>
+                        <p className="font-bold text-slate-900 text-base">El análisis no pudo completarse</p>
+                        <p className="text-sm text-slate-500 mt-1">Hubo un problema al procesar tu contrato. Puedes intentarlo nuevamente.</p>
+                      </div>
+                      <button
+                        onClick={reset}
+                        className="w-full py-3 rounded-2xl bg-slate-900 text-white font-semibold text-sm hover:bg-slate-700 transition-colors"
+                      >
+                        Intentar de nuevo
+                      </button>
+                    </div>
                   )}
                 </div>
               </div>
