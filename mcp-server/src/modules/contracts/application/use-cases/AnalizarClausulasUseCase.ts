@@ -65,57 +65,35 @@ export class AnalizarClausulasUseCase {
       pdfBase64 = Buffer.from(await pdfRes.arrayBuffer()).toString("base64");
     }
 
-    const hasLawFiles = !!(lawFileIds.ley19628 && lawFileIds.ley21521);
-
-    // Build content array
+    // Build content — contract PDF + prompt
+    // Law context comes from Claude's training knowledge (simpler, no Files API)
     type AnyContent = Record<string, unknown>;
-    const content: AnyContent[] = [];
-
-    // Add law PDFs with cache_control if available
-    if (lawFileIds.ley19628) {
-      content.push({
+    const content: AnyContent[] = [
+      {
         type: "document",
-        source: { type: "file", file_id: lawFileIds.ley19628 },
-        cache_control: { type: "ephemeral" },
-      });
-    }
-
-    if (lawFileIds.ley21521) {
-      content.push({
-        type: "document",
-        source: { type: "file", file_id: lawFileIds.ley21521 },
-        cache_control: { type: "ephemeral" },
-      });
-    }
-
-    // Add contract PDF (unique per call — no caching)
-    content.push({
-      type: "document",
-      source: { type: "base64", media_type: "application/pdf", data: pdfBase64 },
-    });
-
-    content.push({ type: "text", text: this.buildPrompt(input) });
+        source: { type: "base64", media_type: "application/pdf", data: pdfBase64 },
+      },
+      { type: "text", text: this.buildPrompt(input) },
+    ];
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const createParams: any = {
-      model: "claude-sonnet-4-6",
-      max_tokens: 4096,
-      messages: [{ role: "user", content }],
-    };
+    const raw: any = await (this.anthropic.messages.create as any)(
+      {
+        model: "claude-sonnet-4-6",
+        max_tokens: 4096,
+        messages: [{ role: "user", content }],
+      },
+      { headers: { "anthropic-beta": "pdfs-2024-09-25" } }
+    );
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    let raw: any;
-    if (hasLawFiles) {
-      raw = await this.anthropic.beta.messages.create(createParams, {
-        headers: { "anthropic-beta": "files-api-2025-04-14" },
-      });
-    } else {
-      raw = await this.anthropic.messages.create(createParams);
+    const blocks = raw.content as any[];
+    console.log("[AnalizarClausulas] response blocks:", blocks.map((b: any) => b.type).join(", "));
+    const textBlock = blocks.find((b: any) => b.type === "text");
+    if (!textBlock) {
+      console.error("[AnalizarClausulas] no text block. stop_reason:", raw.stop_reason, "| usage:", JSON.stringify(raw.usage));
+      throw new Error("no_content");
     }
-
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const textBlock = (raw.content as any[]).find((b: any) => b.type === "text");
-    if (!textBlock) throw new Error("no_content");
 
     const rawText: string = textBlock.text;
 
