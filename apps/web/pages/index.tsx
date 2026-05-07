@@ -48,68 +48,78 @@ export default function Home() {
           <span className="text-xs text-slate-400 bg-slate-100 px-2.5 py-1 rounded-full font-medium">{HACKATHON_LABEL}</span>
         </header>
 
-        {/* Contenido scrolleable */}
+        {/* Contenido */}
         <main className="flex-1 overflow-y-auto">
-          <div className="min-h-full flex items-center justify-center px-4 py-8">
-          <div className="w-full max-w-lg">
-            {/* Hero text — solo en primer paso */}
+          <div className="min-h-full flex items-center justify-center px-6 py-8">
+
+            {/* Paso 1 — layout dos columnas */}
             {step === "email" && (
-              <div className="text-center mb-8">
-                <span className="inline-block text-xs font-semibold text-emerald-700 bg-emerald-50 border border-emerald-100 px-3 py-1 rounded-full mb-4">
-                  Privacidad · Transparencia · Control
-                </span>
-                <h1 className="text-4xl font-extrabold text-slate-900 tracking-tight mb-3 leading-tight">
-                  ¿Tus datos están<br />
-                  <span className="text-emerald-600">realmente seguros?</span>
-                </h1>
-                <p className="text-slate-500 text-base max-w-sm mx-auto">
-                  Sube tu contrato bancario y te decimos exactamente cómo están usando tus datos — y qué hacer al respecto.
-                </p>
-              </div>
-            )}
-
-            {/* Wizard card */}
-            <div className="bg-white rounded-3xl shadow-xl shadow-slate-200/60 border border-slate-100 px-8 py-8">
-              <StepIndicator current={step} />
-
-              {step === "email" && (
-                <StepEmail
-                  email={email}
-                  nombre={nombre}
-                  rut={rut}
-                  onChangeEmail={setEmail}
-                  onChangeNombre={setNombre}
-                  onChangeRut={setRut}
-                  onNext={goToUpload}
-                />
-              )}
-              {step === "upload" && (
-                <StepUpload file={file} onFile={setFile} onNext={startAnalysis} onBack={goToEmail} />
-              )}
-              {step === "analyzing" && (
-                <StepAnalyzing labels={labels} error={error} email={email} />
-              )}
-              {step === "alert" && alert && (
-                <StepAlert alert={alert} onReset={reset} />
-              )}
-              {step === "manual_input" && (
-                <StepManualInput onSubmit={retryWithManual} loading={manualLoading} />
-              )}
-            </div>
-
-            {step === "email" && (
-              <div className="flex items-center justify-center gap-6 mt-6 text-xs text-slate-400">
-                {["Sin almacenamiento", "100% privado", "3 MCPs conectados"].map((t) => (
-                  <span key={t} className="flex items-center gap-1.5">
-                    <svg className="w-3.5 h-3.5 text-green-500" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                    </svg>
-                    {t}
+              <div className="w-full max-w-5xl flex items-center gap-16">
+                {/* Izquierda — hero */}
+                <div className="flex-1 hidden md:flex flex-col">
+                  <span className="inline-block text-xs font-semibold text-emerald-700 bg-emerald-50 border border-emerald-100 px-3 py-1 rounded-full mb-6 w-fit">
+                    Privacidad · Transparencia · Control
                   </span>
-                ))}
+                  <h1 className="text-5xl font-extrabold text-slate-900 tracking-tight mb-4 leading-tight">
+                    ¿Tus datos están<br />
+                    <span className="text-emerald-600">realmente seguros?</span>
+                  </h1>
+                  <p className="text-slate-500 text-lg leading-relaxed mb-10 max-w-sm">
+                    Sube tu contrato bancario y te decimos exactamente cómo están usando tus datos — y qué hacer al respecto.
+                  </p>
+                  <div className="flex flex-col gap-3 text-sm text-slate-500">
+                    {[
+                      { icon: "🔒", text: "Tus documentos no se almacenan" },
+                      { icon: "⚡", text: "Análisis en menos de 60 segundos" },
+                      { icon: "⚖️", text: "Basado en Ley 19.628 y Ley 21.521" },
+                    ].map(({ icon, text }) => (
+                      <span key={text} className="flex items-center gap-3">
+                        <span className="text-lg">{icon}</span>
+                        {text}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Derecha — wizard */}
+                <div className="w-full md:w-[420px] flex-shrink-0">
+                  <div className="bg-white rounded-3xl shadow-xl shadow-slate-200/60 border border-slate-100 px-8 py-8">
+                    <StepIndicator current={step} />
+                    <StepEmail
+                      email={email}
+                      nombre={nombre}
+                      rut={rut}
+                      onChangeEmail={setEmail}
+                      onChangeNombre={setNombre}
+                      onChangeRut={setRut}
+                      onNext={goToUpload}
+                    />
+                  </div>
+                </div>
               </div>
             )}
-          </div>
+
+            {/* Pasos 2, 3, 4 — columna centrada */}
+            {step !== "email" && (
+              <div className="w-full max-w-lg">
+                <div className="bg-white rounded-3xl shadow-xl shadow-slate-200/60 border border-slate-100 px-8 py-8">
+                  <StepIndicator current={step} />
+                  {step === "upload" && (
+                    <StepUpload file={file} onFile={setFile} onNext={startAnalysis} onBack={goToEmail} />
+                  )}
+                  {step === "analyzing" && (
+                    <StepAnalyzing labels={labels} error={error} email={email} />
+                  )}
+                  {step === "alert" && alert && (
+                    <StepAlert alert={alert} onReset={reset} />
+                  )}
+                  {step === "manual_input" && (
+                    <StepManualInput onSubmit={retryWithManual} loading={manualLoading} />
+                  )}
+                </div>
+              </div>
+            )}
+
           </div>
         </main>
       </div>
