@@ -1,4 +1,5 @@
 import Head from "next/head";
+import type { WizardStep, AlertType } from "@/types";
 import { useWizard } from "@/hooks/useWizard";
 import { HACKATHON_LABEL } from "@/lib/constants";
 import StepIndicator from "@/components/wizard/StepIndicator";
@@ -9,11 +10,100 @@ import StepResults from "@/components/wizard/StepResults";
 import StepAlert from "@/components/wizard/StepAlert";
 import StepManualInput from "@/components/wizard/StepManualInput";
 
+// ── Left side content per step ───────────────────────────────────────────────
+
+interface LeftContent {
+  badge?: string;
+  title: string;
+  subtitle: string;
+  bullets: { icon: string; text: string }[];
+}
+
+function getLeftContent(step: WizardStep, alertType?: AlertType): LeftContent {
+  if (step === "email") return {
+    badge: "Privacidad · Transparencia · Control",
+    title: "¿Tus datos están realmente seguros?",
+    subtitle: "Sube tu contrato bancario y te decimos exactamente cómo están usando tus datos — y qué hacer al respecto.",
+    bullets: [
+      { icon: "🔒", text: "Tus documentos no se almacenan" },
+      { icon: "⚡", text: "Análisis en menos de 60 segundos" },
+      { icon: "⚖️", text: "Basado en Ley 19.628 y Ley 21.521" },
+    ],
+  };
+
+  if (step === "upload") return {
+    title: "Sube tu contrato",
+    subtitle: "Necesitamos el PDF de tu contrato bancario, de tarjeta de crédito o cualquier producto financiero.",
+    bullets: [
+      { icon: "📄", text: "Solo archivos PDF" },
+      { icon: "🏦", text: "Contratos de bancos, financieras o cooperativas" },
+      { icon: "🔐", text: "El archivo se elimina al terminar el análisis" },
+    ],
+  };
+
+  if (step === "analyzing") return {
+    title: "Analizando tu contrato",
+    subtitle: "Estamos revisando cada cláusula contra la legislación chilena de protección de datos.",
+    bullets: [
+      { icon: "🏛️", text: "Verificamos la institución en CMF" },
+      { icon: "⚖️", text: "Detectamos cláusulas que exceden la Ley 19.628" },
+      { icon: "✉️", text: "Generamos tu carta ARCO lista para enviar" },
+    ],
+  };
+
+  if (step === "alert") {
+    if (alertType === "not_a_contract") return {
+      title: "Archivo no válido",
+      subtitle: "El documento que subiste no corresponde a un contrato financiero.",
+      bullets: [
+        { icon: "📄", text: "Debe ser un contrato de banco, tarjeta o crédito" },
+        { icon: "🔍", text: "Busca el contrato firmado con tu institución" },
+        { icon: "↩️", text: "Puedes intentarlo con otro archivo" },
+      ],
+    };
+    if (alertType === "rut_mismatch") return {
+      title: "Posible suplantación",
+      subtitle: "El RUT del contrato no coincide con el registrado oficialmente en la CMF.",
+      bullets: [
+        { icon: "🚨", text: "Señal de alerta de fraude bancario" },
+        { icon: "🏛️", text: "Verifica la identidad de la institución" },
+        { icon: "📋", text: "Denuncia en CMF si tienes dudas" },
+      ],
+    };
+    return {
+      title: "Institución no encontrada",
+      subtitle: "No encontramos esta empresa en el registro oficial de la CMF.",
+      bullets: [
+        { icon: "🏛️", text: "Solo instituciones reguladas por CMF" },
+        { icon: "⚠️", text: "Podría ser una empresa no autorizada" },
+        { icon: "🔗", text: "Consulta el registro oficial de alertas" },
+      ],
+    };
+  }
+
+  if (step === "manual_input") return {
+    title: "Ingresa los datos manualmente",
+    subtitle: "No pudimos identificar automáticamente el banco en el PDF. Ingrésalo tú para continuar.",
+    bullets: [
+      { icon: "🔍", text: "Busca el nombre completo en el encabezado del contrato" },
+      { icon: "🔢", text: "El RUT aparece generalmente en la primera página" },
+      { icon: "✅", text: "Lo verificaremos contra el registro CMF" },
+    ],
+  };
+
+  return {
+    title: "ResGuard AI",
+    subtitle: "Protege tus datos personales.",
+    bullets: [],
+  };
+}
+
+// ── Main ─────────────────────────────────────────────────────────────────────
+
 export default function Home() {
   const { state, setEmail, setNombre, setRut, setFile, goToUpload, goToEmail, startAnalysis, retryWithManual, reset } = useWizard();
   const { step, email, nombre, rut, file, labels, result, alert, manualLoading, error } = state;
 
-  // Results take over the full page
   if (step === "results" && result) {
     return (
       <>
@@ -26,16 +116,18 @@ export default function Home() {
     );
   }
 
+  const left = getLeftContent(step, alert?.type);
+
   return (
     <>
       <Head>
         <title>ResGuard AI — Protege tus datos</title>
-        <meta name="description" content="Analiza tu privacidad en Gmail, Drive y Calendar" />
+        <meta name="description" content="Analiza tu privacidad en contratos financieros chilenos" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
       </Head>
 
       <div className="h-screen overflow-hidden bg-gradient-to-br from-slate-50 via-white to-emerald-50/40 flex flex-col">
-        {/* Navbar — fijo */}
+        {/* Navbar */}
         <header className="flex-shrink-0 flex items-center justify-between px-6 py-4 border-b border-slate-100 bg-white/70 backdrop-blur-sm z-10">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-emerald-600 flex items-center justify-center shadow-sm">
@@ -48,43 +140,40 @@ export default function Home() {
           <span className="text-xs text-slate-400 bg-slate-100 px-2.5 py-1 rounded-full font-medium">{HACKATHON_LABEL}</span>
         </header>
 
-        {/* Contenido */}
+        {/* Contenido — siempre dos columnas en md+ */}
         <main className="flex-1 overflow-y-auto">
           <div className="min-h-full flex items-center justify-center px-6 py-8">
+            <div className="w-full max-w-5xl flex items-center gap-16">
 
-            {/* Paso 1 — layout dos columnas */}
-            {step === "email" && (
-              <div className="w-full max-w-5xl flex items-center gap-16">
-                {/* Izquierda — hero */}
-                <div className="flex-1 hidden md:flex flex-col">
+              {/* Izquierda — texto contextual */}
+              <div className="flex-1 hidden md:flex flex-col">
+                {left.badge && (
                   <span className="inline-block text-xs font-semibold text-emerald-700 bg-emerald-50 border border-emerald-100 px-3 py-1 rounded-full mb-6 w-fit">
-                    Privacidad · Transparencia · Control
+                    {left.badge}
                   </span>
-                  <h1 className="text-5xl font-extrabold text-slate-900 tracking-tight mb-4 leading-tight">
-                    ¿Tus datos están<br />
-                    <span className="text-emerald-600">realmente seguros?</span>
-                  </h1>
-                  <p className="text-slate-500 text-lg leading-relaxed mb-10 max-w-sm">
-                    Sube tu contrato bancario y te decimos exactamente cómo están usando tus datos — y qué hacer al respecto.
-                  </p>
-                  <div className="flex flex-col gap-3 text-sm text-slate-500">
-                    {[
-                      { icon: "🔒", text: "Tus documentos no se almacenan" },
-                      { icon: "⚡", text: "Análisis en menos de 60 segundos" },
-                      { icon: "⚖️", text: "Basado en Ley 19.628 y Ley 21.521" },
-                    ].map(({ icon, text }) => (
-                      <span key={text} className="flex items-center gap-3">
-                        <span className="text-lg">{icon}</span>
-                        {text}
-                      </span>
-                    ))}
-                  </div>
+                )}
+                <h1 className="text-4xl font-extrabold text-slate-900 tracking-tight mb-4 leading-tight">
+                  {left.title}
+                </h1>
+                <p className="text-slate-500 text-base leading-relaxed mb-8 max-w-sm">
+                  {left.subtitle}
+                </p>
+                <div className="flex flex-col gap-3">
+                  {left.bullets.map(({ icon, text }) => (
+                    <span key={text} className="flex items-center gap-3 text-sm text-slate-500">
+                      <span className="text-lg">{icon}</span>
+                      {text}
+                    </span>
+                  ))}
                 </div>
+              </div>
 
-                {/* Derecha — wizard */}
-                <div className="w-full md:w-[420px] flex-shrink-0">
-                  <div className="bg-white rounded-3xl shadow-xl shadow-slate-200/60 border border-slate-100 px-8 py-8">
-                    <StepIndicator current={step} />
+              {/* Derecha — wizard card */}
+              <div className="w-full md:w-[420px] flex-shrink-0">
+                <div className="bg-white rounded-3xl shadow-xl shadow-slate-200/60 border border-slate-100 px-8 py-8">
+                  <StepIndicator current={step} />
+
+                  {step === "email" && (
                     <StepEmail
                       email={email}
                       nombre={nombre}
@@ -94,16 +183,7 @@ export default function Home() {
                       onChangeRut={setRut}
                       onNext={goToUpload}
                     />
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* Pasos 2, 3, 4 — columna centrada */}
-            {step !== "email" && (
-              <div className="w-full max-w-lg">
-                <div className="bg-white rounded-3xl shadow-xl shadow-slate-200/60 border border-slate-100 px-8 py-8">
-                  <StepIndicator current={step} />
+                  )}
                   {step === "upload" && (
                     <StepUpload file={file} onFile={setFile} onNext={startAnalysis} onBack={goToEmail} />
                   )}
@@ -118,8 +198,8 @@ export default function Home() {
                   )}
                 </div>
               </div>
-            )}
 
+            </div>
           </div>
         </main>
       </div>
