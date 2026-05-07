@@ -80,7 +80,7 @@ export class AnalizarClausulasUseCase {
     const raw: any = await (this.anthropic.messages.create as any)(
       {
         model: "claude-sonnet-4-6",
-        max_tokens: 4096,
+        max_tokens: 8192,
         messages: [{ role: "user", content }],
       },
       { headers: { "anthropic-beta": "pdfs-2024-09-25" } }
