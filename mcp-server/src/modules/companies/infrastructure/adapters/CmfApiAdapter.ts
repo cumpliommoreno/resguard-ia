@@ -1,7 +1,14 @@
 import type { ICompanyProfilePort, CompanyProfileData } from "../../domain/ports/ICompanyProfilePort.js";
 
 const BASE_URL = "https://api.cmfchile.cl/api-sbifv3/recursos_api/perfil/instituciones";
-const PERIOD = "2026/02";
+
+function getCurrentPeriod(): string {
+  const d = new Date();
+  d.setMonth(d.getMonth() - 1); // use previous month to ensure data exists
+  const year  = d.getFullYear();
+  const month = String(d.getMonth() + 1).padStart(2, "0");
+  return `${year}/${month}`;
+}
 
 interface CmfPerfilRaw {
   Perfil?: {
@@ -28,7 +35,7 @@ export class CmfApiAdapter implements ICompanyProfilePort {
   }
 
   async fetch(apiCode: string): Promise<CompanyProfileData> {
-    const url = `${BASE_URL}/${apiCode}/${PERIOD}?apikey=${this.apiKey}&formato=json`;
+    const url = `${BASE_URL}/${apiCode}/${getCurrentPeriod()}?apikey=${this.apiKey}&formato=json`;
 
     const response = await fetch(url);
 
