@@ -97,12 +97,15 @@ export default async function handler(
 
     try {
       const valText = validation.content[0].type === "text" ? validation.content[0].text.trim() : "";
-      const { es_contrato } = JSON.parse(valText);
+      console.log("[analizar] validation response:", valText);
+      const cleaned = valText.replace(/^```(?:json)?\n?/, "").replace(/\n?```$/, "").trim();
+      const { es_contrato } = JSON.parse(cleaned);
       if (!es_contrato) {
         await supabase.from("analyses").update({ status: "pending" }).eq("id", id);
         return res.json({ status: "not_a_contract" });
       }
-    } catch {
+    } catch (e) {
+      console.log("[analizar] validation parse failed:", e);
       // si falla la validación continuamos igual
     }
 
@@ -116,7 +119,7 @@ export default async function handler(
             ...pdfContent,
             {
               type: "text",
-              text: 'Extrae el nombre de la institución financiera o banco y su RUT chileno del contrato. Responde SOLO con JSON sin markdown: {"nombre": "...", "rut": "..."}. Si no encuentras algún dato usa string vacío.',
+              text: 'Extrae el nombre de la institución financiera o banco y su RUT chileno del contrato. Responde SOLO con JSON sin markdown ni explicaciones: {"nombre": "...", "rut": "..."}',
             },
           ],
         },
@@ -125,11 +128,14 @@ export default async function handler(
 
     try {
       const text = extraction.content[0].type === "text" ? extraction.content[0].text.trim() : "";
-      const parsed = JSON.parse(text);
+      console.log("[analizar] extraction response:", text);
+      const cleaned = text.replace(/^```(?:json)?\n?/, "").replace(/\n?```$/, "").trim();
+      const parsed = JSON.parse(cleaned);
       nombre = parsed.nombre ?? "";
       rut = parsed.rut ?? "";
-    } catch {
-      // extraction failed
+      console.log("[analizar] extracted:", { nombre, rut });
+    } catch (e) {
+      console.log("[analizar] extraction parse failed:", e);
     }
   }
 
