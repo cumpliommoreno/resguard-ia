@@ -24,9 +24,11 @@ export default async function handler(
 
     if (!email || !contract) return res.status(400).json({ error: "email and contract are required" });
 
-    // Subir a Vercel Blob
+    // Subir a Vercel Blob con nombre único
     const buffer = readFileSync(contract.filepath);
-    const blob = await put(contract.originalFilename ?? "contract.pdf", buffer, {
+    const ext = (contract.originalFilename ?? "contract.pdf").split(".").pop() ?? "pdf";
+    const uniqueName = `${crypto.randomUUID()}.${ext}`;
+    const blob = await put(uniqueName, buffer, {
       access: "private",
       contentType: contract.mimetype ?? "application/pdf",
     });
