@@ -7,7 +7,8 @@ export const analizarClausulasToolDefinition: Tool = {
   inputSchema: {
     type: "object",
     properties: {
-      file_url: { type: "string", description: "URL del PDF del contrato (Vercel Blob)" },
+      file_url:   { type: "string", description: "URL del PDF del contrato (Vercel Blob)" },
+      pdf_base64: { type: "string", description: "PDF del contrato en base64 (alternativa a file_url)" },
       company: {
         type: "object",
         properties: {
@@ -27,7 +28,7 @@ export const analizarClausulasToolDefinition: Tool = {
         },
       },
     },
-    required: ["file_url", "company"],
+    required: ["company"],
   },
 };
 
@@ -35,7 +36,8 @@ export function createAnalizarClausulasHandler(useCase: AnalizarClausulasUseCase
   return async (args: Record<string, unknown>): Promise<CallToolResult> => {
     try {
       const result = await useCase.execute({
-        file_url: String(args["file_url"] ?? ""),
+        file_url:   args["file_url"]   ? String(args["file_url"])   : undefined,
+        pdf_base64: args["pdf_base64"] ? String(args["pdf_base64"]) : undefined,
         company: args["company"] as {
           nombre: string; rut: string; email: string;
           direccion: string; paginaWeb: string;
