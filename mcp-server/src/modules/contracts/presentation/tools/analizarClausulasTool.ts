@@ -36,8 +36,8 @@ export function createAnalizarClausulasHandler(useCase: AnalizarClausulasUseCase
   return async (args: Record<string, unknown>): Promise<CallToolResult> => {
     try {
       const result = await useCase.execute({
-        file_url:   args["file_url"]   ? String(args["file_url"])   : undefined,
-        pdf_base64: args["pdf_base64"] ? String(args["pdf_base64"]) : undefined,
+        ...(args["file_url"]   ? { file_url:   String(args["file_url"])   } : {}),
+        ...(args["pdf_base64"] ? { pdf_base64: String(args["pdf_base64"]) } : {}),
         company: args["company"] as {
           nombre: string; rut: string; email: string;
           direccion: string; paginaWeb: string;
